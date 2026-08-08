@@ -488,6 +488,62 @@ html, body {
       font-size: 0.95rem !important;
     }
   }
+
+    /* --- CORREÇÃO DEFINITIVA PARA CELULAR --- */
+@media (max-width: 600px) {
+
+  /* 1. Força os blocos principais a ficarem um debaixo do outro */
+  .card, 
+  .calculator-grid, 
+  .results-grid,
+  div[class*="grid"],
+  div[class*="row"],
+  div[class*="container"] {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 2. Corrige o input de CPM e a caixa roxa para não saírem da tela */
+  input, select, .card-custom, div[class*="custom"] {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 3. Alinha os 3 cards coloridos (Baixa, Média, Alta) em linha/grade no celular */
+  div:has(> .card-baixa),
+  div:has(> [class*="baixa"]),
+  .scenarios-container,
+  .cards-container {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 4px !important;
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  /* 4. Reduz o tamanho interno dos 3 cards para caberem lado a lado sem estourar */
+  div[class*="baixa"], 
+  div[class*="media"], 
+  div[class*="alta"],
+  .cpm-card {
+    flex: 1 1 32% !important;
+    width: 32% !important;
+    min-width: 0 !important; /* Impede estouro de texto */
+    padding: 8px 4px !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+  }
+
+  /* Reduz levemente as fontes dentro dos cards para não quebrar número */
+  div[class*="baixa"] *, 
+  div[class*="media"] *, 
+  div[class*="alta"] * {
+    font-size: 0.75rem !important;
+  }
+}
 </style>
 </head>
 
