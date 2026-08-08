@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Pro de CPM & Estimativa de Ganhos</title>
+  <!-- Chart.js para o gráfico de projeção -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- FontAwesome para ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    :root {
+      --bg-body: #f4f7fa;
+      --card-bg: #ffffff;
+      --text-main: #2d3748;
+      --text-muted: #718096;
+      --heading-color: #1b365d;
+      --border-color: #e2e8f0;
+      --input-bg: #ffffff;
+      --input-border: #cbd5e0;
+      --accent-color: #3182ce;
+      --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+
+      --baixa-bg: #fff5f5;
+      --baixa-border: #feb2b2;
+      --baixa-text: #e53e3e;
+
+      --media-bg: #ebf8ff;
+      --media-border: #90cdf4;
+      --media-text: #3182ce;
+
+      --alta-bg: #f0fff4;
+      --alta-border: #9ae6b4;
+      --alta-text: #38a169;
+
+      --custom-bg: #faf5ff;
+      --custom-border: #d6bcfa;
+      --custom-text: #805ad5;
+    }
+
+    [data-theme="dark"] {
+      --bg-body: #0f172a;
+      --card-bg: #1e293b;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --heading-color: #38bdf8;
+      --border-color: #334155;
+      --input-bg: #0f172a;
+      --input-border: #475569;
+      --accent-color: #38bdf8;
+      --shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+
+      --baixa-bg: #2d1215;
+      --baixa-border: #9b2c2c;
+      --baixa-text: #fc8181;
+
+      --media-bg: #0a2540;
+      --media-border: #2b6cb0;
+      --media-text: #63b3ed;
+
+      --alta-bg: #0f2d1e;
+      --alta-border: #276749;
+      --alta-text: #68d391;
+
+      --custom-bg: #281236;
+      --custom-border: #6b46c1;
+      --custom-text: #b794f4;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 950px;
+      padding: 30px;
+      position: relative;
+    }
+
+    /* Controls da Barra Superior */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .top-bar h2 {
+      color: var(--heading-color);
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .top-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-icon {
+      background: var(--bg-body);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-icon:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* Aba de Navegação */
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .tab-btn.active {
+      background-color: var(--accent-color);
+      color: #fff;
+    }
+
+    /* Entradas de Formulário */
+    .grid-inputs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--heading-color);
+      font-size: 13px;
+    }
+
+    input[type="text"],
+    select,
+    input[type="number"] {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--input-bg);
+      border: 1.5px solid var(--input-border);
+      border-radius: 8px;
+      font-size: 15px;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent-color);
+    }
+
+    /* Slider Deslizante */
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent-color);
+      cursor: pointer;
+    }
+
+    /* Layout da Calculadora */
+    .calculator-sections {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--heading-color);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Grid de Resultados */
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      width: 100%;
+    }
+
+    .result-card {
+      border-radius: 10px;
+      padding: 15px 10px;
+      text-align: center;
+      min-width: 0;
+      overflow-wrap: break-word;
+    }
+
+    .result-card.baixa {
+      background-color: var(--baixa-bg);
+      border: 1px solid var(--baixa-border);
+    }
+
+    .result-card.media {
+      background-color: var(--media-bg);
+      border: 1px solid var(--media-border);
+    }
+
+    .result-card.alta {
+      background-color: var(--alta-bg);
+      border: 1px solid var(--alta-border);
+    }
+
+    .result-card.custom {
+      background-color: var(--custom-bg);
+      border: 1px solid var(--custom-border);
+    }
+
+    .result-card h4 {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .result-card.baixa h4 {
+      color: var(--baixa-text);
+    }
+
+    .result-card.media h4 {
+      color: var(--media-text);
+    }
+
+    .result-card.alta h4 {
+      color: var(--alta-text);
+    }
+
+    .result-card.custom h4 {
+      color: var(--custom-text);
+    }
+
+    .result-card .cpm {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .result-card .value {
+      font-size: clamp(12px, 2.5vw, 15px);
+      font-weight: bold;
+      color: var(--text-main);
+      line-height: 1.3;
+    }
+
+    /* Gráfico */
+    .chart-container {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    /* Botões de Ação */
+    .actions-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-primary {
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    /* Rodapé */
+    footer {
+      margin-top: 25px;
+      padding-top: 15px;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: #e1306c;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #22c55e;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: none;
+      z-index: 1000;
+    }
+
+    /* Botão Baixar App no topo */
+    .btn-pwa-topo {
+      display: none;
+      /* Inicia oculto até o navegador permitir */
+    }
+
+    /* Garante o mesmo estilo visual dos botões do topo */
+    #btnInstalar {
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i> Resumo copiado com sucesso!</div>
+
+  <div class="card">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <h2><i class="fa-solid fa-calculator"></i> Calculadora CPM Pro</h2>
+      <div class="top-controls">
+        <button class="btn-icon" onclick="toggleCurrency()" id="currency-btn">
+          <i class="fa-solid fa-coins"></i> Moeda: <strong id="lbl-currency">BRL (R$)</strong>
+        </button>
+        <button class="btn-icon" onclick="toggleTheme()" id="theme-btn">
+          <i class="fa-solid fa-moon"></i> Modo
+        </button>
+        <button class="btn-icon" id="btnInstalar">
+          <i class="fa-solid fa-download"></i> Baixar App
+        </button>
+      </div>
+    </div>
+
+    <!-- Navegação por Abas -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('direta')"><i class="fa-solid fa-chart-line"></i> Estimativa por
+        Views</button>
+      <button class="tab-btn" onclick="switchTab('reversa')"><i class="fa-solid fa-bullseye"></i> Calculadora Reversa
+        (Meta)</button>
+    </div>
+
+    <!-- TAB 1: ESTIMATIVA DIRETA -->
+    <div id="tab-direta" class="tab-content active">
+      <div class="grid-inputs">
+        <div class="input-group">
+          <label for="platform"><i class="fa-solid fa-layer-group"></i> Plataforma / Formato:</label>
+          <select id="platform" onchange="calcular()">
+            <option value="yt_long" data-baixa="0.80" data-media="1.50" data-alta="3.00">YouTube Vídeos Longos (CPM
+              ~$1.50 USD)</option>
+            <option value="yt_shorts" data-baixa="0.02" data-media="0.05" data-alta="0.09">YouTube Shorts (CPM ~$0.05
+              USD)</option>
+            <option value="tiktok" data-baixa="0.02" data-media="0.04" data-alta="0.08">TikTok Creator Fund (CPM ~$0.04
+              USD)</option>
+            <option value="reels" data-baixa="0.03" data-media="0.06" data-alta="0.12">Instagram Reels / Meta (CPM
+              ~$0.06 USD)</option>
+            <option value="blog" data-baixa="0.50" data-media="1.20" data-alta="2.50">Blog / Site AdSense (CPM ~$1.20
+              USD)</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="niche"><i class="fa-solid fa-tag"></i> Nicho do Conteúdo:</label>
+          <select id="niche" onchange="calcular()">
+            <option value="2.2">Finanças, Investimentos & Negócios (+120%)</option>
+            <option value="1.6">Tecnologia, Marketing & Software (+60%)</option>
+            <option value="1.1">Saúde, Fitness & Estilo de Vida (+10%)</option>
+            <option value="1.0" selected>Geral, Vlogs & Curiosidades (Padrão)</option>
+            <option value="0.8">Entretenimento & Memes (-20%)</option>
+            <option value="0.7">Games & Jogos (-30%)</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="usd-rate"><i class="fa-solid fa-dollar-sign"></i> Cotação do Dólar (R$):</label>
+          <input type="number" id="usd-rate" value="5.20" step="0.05" oninput="calcular()">
+        </div>
+      </div>
+
+      <!-- Slider & Input de Views -->
+      <div class="input-group">
+        <label for="views"><i class="fa-solid fa-eye"></i> Visualizações Estimadas no Mês:</label>
+        <input type="text" id="views" value="500.000" oninput="sincronizarInputParaSlider()">
+        <div class="slider-container">
+          <span style="font-size: 11px; color: var(--text-muted)">10k</span>
+          <input type="range" id="views-slider" min="10000" max="10000000" step="10000" value="500000"
+            oninput="sincronizarSliderParaInput()">
+          <span style="font-size: 11px; color: var(--text-muted)">10M</span>
+        </div>
+      </div>
+
+      <!-- Seção de Resultados -->
+      <div class="calculator-sections">
+        <div>
+          <div class="section-title">Cenários da Plataforma <i class="fa-solid fa-sliders"></i></div>
+          <div class="results-grid">
+            <div class="result-card baixa">
+              <h4>Baixa</h4>
+              <div class="cpm" id="lbl-cpm-baixa">CPM ...</div>
+              <div class="value" id="res-baixa">R$ 0,00</div>
+            </div>
+            <div class="result-card media">
+              <h4>Média</h4>
+              <div class="cpm" id="lbl-cpm-media">CPM ...</div>
+              <div class="value" id="res-media">R$ 0,00</div>
+            </div>
+            <div class="result-card alta">
+              <h4>Alta</h4>
+              <div class="cpm" id="lbl-cpm-alta">CPM ...</div>
+              <div class="value" id="res-alta">R$ 0,00</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-title">CPM Personalizado <i class="fa-solid fa-pen"></i></div>
+          <div class="input-group" style="margin-bottom: 0;">
+            <input type="text" id="cpm-custom" value="0.50" placeholder="Ex: 0.50" oninput="calcular()">
+          </div>
+          <div class="result-card custom" style="margin-top: 8px;">
+            <h4>Estimativa com seu CPM</h4>
+            <div class="cpm" id="lbl-custom-cpm">CPM ...</div>
+            <div class="value" id="res-custom">R$ 0,00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico de Projeção Anual -->
+      <div class="chart-container">
+        <div class="section-title"><i class="fa-solid fa-chart-column"></i> Projeção Anual Acumulada (12 Meses)</div>
+        <canvas id="annualChart" height="110"></canvas>
+      </div>
+    </div>
+
+    <!-- TAB 2: CALCULADORA REVERSA -->
+    <div id="tab-reversa" class="tab-content">
+      <p class="subtitle" style="text-align: left; margin-bottom: 15px;">Descubra quantas visualizações você precisa
+        fazer por mês e por dia para atingir sua meta financeira.</p>
+
+      <div class="grid-inputs">
+        <div class="input-group">
+          <label for="target-revenue"><i class="fa-solid fa-bullseye"></i> Meta de Ganhos / Mês:</label>
+          <input type="text" id="target-revenue" value="3.000,00" oninput="formatarECalcularReversa()">
+        </div>
+
+        <div class="input-group">
+          <label for="cpm-reversa"><i class="fa-solid fa-dollar-sign"></i> CPM Estimado:</label>
+          <input type="text" id="cpm-reversa" value="0.20" oninput="formatarECalcularReversa()">
+        </div>
+      </div>
+
+      <div class="calculator-sections">
+        <div class="result-card media" style="padding: 20px;">
+          <h4><i class="fa-solid fa-calendar-days"></i> Views Mensais Necessárias</h4>
+          <div class="value" id="res-views-monthly" style="font-size: 22px; margin-top: 10px;">15.000.000</div>
+        </div>
+        <div class="result-card alta" style="padding: 20px;">
+          <h4><i class="fa-solid fa-fire"></i> Meta Diária de Views</h4>
+          <div class="value" id="res-views-daily" style="font-size: 22px; margin-top: 10px;">500.000</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="actions-bar">
+      <button class="btn-primary" onclick="copiarResumo()"><i class="fa-solid fa-copy"></i> Copiar Resumo /
+        Compartilhar</button>
+    </div>
+
+    <!-- Rodapé -->
+    <footer>
+      Desenvolvido por <a href="https://instagram.com/adeniltonjacinto" target="_blank"
+        rel="noopener noreferrer">@adeniltonjacinto</a>
+    </footer>
+  </div>
+
+  <script>
+    let currency = 'BRL'; // 'BRL' ou 'USD'
+    let myChart = null;
+
+    function toggleCurrency() {
+      currency = currency === 'BRL' ? 'USD' : 'BRL';
+      document.getElementById('lbl-currency').innerText = currency === 'BRL' ? 'BRL (R$)' : 'USD ($)';
+      calcular();
+      formatarECalcularReversa();
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      const isDark = body.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        body.removeAttribute('data-theme');
+        document.getElementById('theme-btn').innerHTML = '<i class="fa-solid fa-moon"></i> Modo';
+      } else {
+        body.setAttribute('data-theme', 'dark');
+        document.getElementById('theme-btn').innerHTML = '<i class="fa-solid fa-sun"></i> Claro';
+      }
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      if (tab === 'direta') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('tab-direta').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('tab-reversa').classList.add('active');
+        formatarECalcularReversa();
+      }
+    }
+
+    function sincronizarInputParaSlider() {
+      const input = document.getElementById('views');
+      let limpo = input.value.replace(/\D/g, '');
+      if (limpo) {
+        input.value = Number(limpo).toLocaleString('pt-BR');
+        document.getElementById('views-slider').value = limpo;
+      } else {
+        input.value = '';
+      }
+      calcular();
+    }
+
+    function sincronizarSliderParaInput() {
+      const sliderVal = document.getElementById('views-slider').value;
+      document.getElementById('views').value = Number(sliderVal).toLocaleString('pt-BR');
+      calcular();
+    }
+
+    function formatarMoeda(valor) {
+      if (currency === 'BRL') {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      } else {
+        return valor.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+      }
+    }
+
+    function calcular() {
+      const viewsInput = document.getElementById('views').value.replace(/\D/g, '');
+      const views = parseFloat(viewsInput) || 0;
+
+      const platformSelect = document.getElementById('platform');
+      const selectedOpt = platformSelect.options[platformSelect.selectedIndex];
+
+      // CPM base em USD
+      const cpmBaixaUSD = parseFloat(selectedOpt.getAttribute('data-baixa'));
+      const cpmMediaUSD = parseFloat(selectedOpt.getAttribute('data-media'));
+      const cpmAltaUSD = parseFloat(selectedOpt.getAttribute('data-alta'));
+
+      // Multiplicadores
+      const nicheMult = parseFloat(document.getElementById('niche').value) || 1.0;
+      const usdRate = parseFloat(document.getElementById('usd-rate').value) || 5.20;
+
+      // Fator de conversão
+      const factor = currency === 'BRL' ? (usdRate * nicheMult) : nicheMult;
+
+      const cpmBaixa = cpmBaixaUSD * factor;
+      const cpmMedia = cpmMediaUSD * factor;
+      const cpmAlta = cpmAltaUSD * factor;
+
+      // CPM Custom
+      let cpmCustomStr = document.getElementById('cpm-custom').value.replace(',', '.');
+      const cpmCustom = parseFloat(cpmCustomStr) || 0;
+
+      // Valores calculados
+      const valBaixa = (views / 1000) * cpmBaixa;
+      const valMedia = (views / 1000) * cpmMedia;
+      const valAlta = (views / 1000) * cpmAlta;
+      const valCustom = (views / 1000) * cpmCustom;
+
+      // Rótulos
+      const symbol = currency === 'BRL' ? 'R$' : '$';
+      document.getElementById('lbl-cpm-baixa').innerText = `CPM ${symbol} ${cpmBaixa.toFixed(2)}`;
+      document.getElementById('lbl-cpm-media').innerText = `CPM ${symbol} ${cpmMedia.toFixed(2)}`;
+      document.getElementById('lbl-cpm-alta').innerText = `CPM ${symbol} ${cpmAlta.toFixed(2)}`;
+      document.getElementById('lbl-custom-cpm').innerText = `CPM ${symbol} ${cpmCustom.toFixed(2)}`;
+
+      document.getElementById('res-baixa').innerText = formatarMoeda(valBaixa);
+      document.getElementById('res-media').innerText = formatarMoeda(valMedia);
+      document.getElementById('res-alta').innerText = formatarMoeda(valAlta);
+      document.getElementById('res-custom').innerText = formatarMoeda(valCustom);
+
+      atualizarGrafico(valBaixa, valMedia, valAlta);
+    }
+
+    function atualizarGrafico(mBaixa, mMedia, mAlta) {
+      const ctx = document.getElementById('annualChart').getContext('2d');
+      const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+      const dataBaixa = meses.map((_, i) => mBaixa * (i + 1));
+      const dataMedia = meses.map((_, i) => mMedia * (i + 1));
+      const dataAlta = meses.map((_, i) => mAlta * (i + 1));
+
+      if (myChart) myChart.destroy();
+
+      myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: meses,
+          datasets: [
+            { label: 'Cenário Baixo', data: dataBaixa, borderColor: '#e53e3e', backgroundColor: 'rgba(229, 62, 62, 0.1)', fill: true, tension: 0.3 },
+            { label: 'Cenário Médio', data: dataMedia, borderColor: '#3182ce', backgroundColor: 'rgba(49, 130, 206, 0.1)', fill: true, tension: 0.3 },
+            { label: 'Cenário Alto', data: dataAlta, borderColor: '#38a169', backgroundColor: 'rgba(56, 161, 105, 0.1)', fill: true, tension: 0.3 }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' }
+          },
+          scales: {
+            y: {
+              ticks: {
+                callback: function (value) { return symbolFormat(value); }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function symbolFormat(val) {
+      const sym = currency === 'BRL' ? 'R$' : '$';
+      if (val >= 1000000) return `${sym} ${(val / 1000000).toFixed(1)}M`;
+      if (val >= 1000) return `${sym} ${(val / 1000).toFixed(0)}k`;
+      return `${sym} ${val}`;
+    }
+
+    function formatarECalcularReversa() {
+      const targetInput = document.getElementById('target-revenue');
+      const cpmInput = document.getElementById('cpm-reversa');
+
+      let targetLimpo = targetInput.value.replace(/\D/g, '');
+      if (targetLimpo) {
+        targetInput.value = (Number(targetLimpo) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      }
+      const targetVal = parseFloat(targetLimpo) / 100 || 0;
+
+      let cpmValStr = cpmInput.value.replace(',', '.');
+      const cpmVal = parseFloat(cpmValStr) || 0;
+
+      if (cpmVal > 0) {
+        const viewsMensais = (targetVal / cpmVal) * 1000;
+        const viewsDiarias = viewsMensais / 30;
+
+        document.getElementById('res-views-monthly').innerText = Math.round(viewsMensais).toLocaleString('pt-BR') + ' views';
+        document.getElementById('res-views-daily').innerText = Math.round(viewsDiarias).toLocaleString('pt-BR') + ' views/dia';
+      } else {
+        document.getElementById('res-views-monthly').innerText = '0 views';
+        document.getElementById('res-views-daily').innerText = '0 views/dia';
+      }
+    }
+
+    function copiarResumo() {
+      const views = document.getElementById('views').value;
+      const media = document.getElementById('res-media').innerText;
+      const alta = document.getElementById('res-alta').innerText;
+
+      const texto = `📊 *Resumo de Estimativa de CPM*\n\n` +
+        `👀 Views Mensais: ${views}\n` +
+        `💵 Estimativa Média: ${media}/mês\n` +
+        `🚀 Estimativa Alta: ${alta}/mês\n\n` +
+        `Calculado via Calculadora CPM Pro`;
+
+      navigator.clipboard.writeText(texto).then(() => {
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 3000);
+      });
+    }
+
+    window.onload = function () {
+      calcular();
+    };
+
+
+    // --- Lógica de Instalação do App ---
+    let eventoInstalacao;
+    const btnInstalar = document.getElementById('btnInstalar');
+
+    // Captura a permissão de instalação do navegador
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      eventoInstalacao = e;
+    });
+
+    // Clique no botão de instalar
+    if (btnInstalar) {
+      btnInstalar.addEventListener('click', async () => {
+        if (eventoInstalacao) {
+          // Abre a tela nativa de confirmação do celular
+          eventoInstalacao.prompt();
+          const { outcome } = await eventoInstalacao.userChoice;
+
+          if (outcome === 'accepted') {
+            btnInstalar.style.display = 'none'; // Esconde o botão após instalar
+          }
+          eventoInstalacao = null;
+        } else {
+          // Caso a pessoa esteja no PC sem suporte ou iPhone
+          alert('Para instalar, abra pelo navegador Chrome no Android ou clique em "Compartilhar > Adicionar à Tela de Início" no Safari (iOS).');
+        }
+      });
+    }
+
+    // Registrar o Service Worker (necessário para ser PWA)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => { });
+    }
+  </script>
+</body>
+
+</html>
