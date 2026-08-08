@@ -319,14 +319,12 @@
       line-height: 1.3;
     }
 
-    /* Gráfico */
     .chart-container {
       margin-top: 30px;
       padding-top: 20px;
       border-top: 1px solid var(--border-color);
     }
 
-    /* Botões de Ação */
     .actions-bar {
       display: flex;
       justify-content: flex-end;
@@ -394,16 +392,65 @@
       z-index: 1000;
     }
 
-    /* Botão Baixar App no topo */
     .btn-pwa-topo {
       display: none;
-      /* Inicia oculto até o navegador permitir */
     }
 
-    /* Garante o mesmo estilo visual dos botões do topo */
     #btnInstalar {
       cursor: pointer;
     }
+
+    /* =======================================================
+   RESPONSIVIDADE (SITE E APP PWA)
+   ======================================================= */
+
+html, body {
+  overflow-x: hidden; /* Impede rolagem lateral indesejada */
+  max-width: 100vw;
+}
+
+@media (max-width: 600px) {
+  
+  .top-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  /* 2. Deixa o título centralizado e proporcional */
+  .top-bar h2 {
+    font-size: 1.25rem !important;
+    text-align: center;
+  }
+
+  .top-controls {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    gap: 8px !important;
+    justify-content: center !important;
+  }
+
+  .btn-icon {
+    flex: 1 1 calc(50% - 8px) !important; /* Cada botão ocupa metade da tela */
+    min-height: 42px; /* Área de toque confortável para o polegar */
+    font-size: 0.8rem !important;
+    padding: 8px 10px !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+
+  .btn-icon:nth-child(3) {
+    flex: 1 1 100% !important;
+  }
+}
+
+@media display-mode: standalone {
+  body {
+    -webkit-user-select: none; /* Deixa o uso mais parecido com app nativo */
+    user-select: none;
+  }
+}
   </style>
 </head>
 
