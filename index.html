@@ -399,151 +399,103 @@
     #btnInstalar {
       cursor: pointer;
     }
+/* =======================================================
+       RESPONSIVIDADE PERFEITA PARA CELULAR (SITES E PWA)
+       ======================================================= */
 
-    /* =======================================================
-   RESPONSIVIDADE (SITE E APP PWA)
-   ======================================================= */
-
-html, body {
-  overflow-x: hidden; /* Impede rolagem lateral indesejada */
-  max-width: 100vw;
-}
-
-@media (max-width: 600px) {
-  
-  .top-bar {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 12px !important;
-  }
-
-  /* 2. Deixa o título centralizado e proporcional */
-  .top-bar h2 {
-    font-size: 1.25rem !important;
-    text-align: center;
-  }
-
-  .top-controls {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    width: 100% !important;
-    gap: 8px !important;
-    justify-content: center !important;
-  }
-
-  .btn-icon {
-    flex: 1 1 calc(50% - 8px) !important; /* Cada botão ocupa metade da tela */
-    min-height: 42px; /* Área de toque confortável para o polegar */
-    font-size: 0.8rem !important;
-    padding: 8px 10px !important;
-    justify-content: center !important;
-    white-space: nowrap !important;
-  }
-
-  .btn-icon:nth-child(3) {
-    flex: 1 1 100% !important;
-  }
-}
-
-/* Modo App Instalado (PWA em Tela Cheia) */
-  @media (display-mode: standalone) {
-    body {
-      -webkit-user-select: none;
-      user-select: none;
-    }
-  }
-
-  /* --- Ajuste dos Quadros Coloridos de CPM no Celular --- */
-  @media (max-width: 600px) {
-    .grid-results, 
-    .results-container,
-    div[style*="display: flex"] {
-      flex-direction: column !important;
-      width: 100% !important;
+    /* Modo App Instalado */
+    @media (display-mode: standalone) {
+      body {
+        -webkit-user-select: none;
+        user-select: none;
+      }
     }
 
-    .cpm-boxes,
-    .cards-wrapper {
-      display: flex !important;
-      flex-wrap: wrap !important;
-      gap: 8px !important;
-      width: 100% !important;
+    /* Ajustes para telas até 600px */
+    @media (max-width: 600px) {
+      /* 1. Ajusta as margens externas e internas para aproveitar a tela */
+      body {
+        padding: 10px 8px !important;
+      }
+
+      .card {
+        padding: 15px 10px !important;
+        border-radius: 12px !important;
+      }
+
+      /* 2. Reorganiza a barra do topo e os botões */
+      .top-bar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+      }
+
+      .top-bar h2 {
+        font-size: 1.2rem !important;
+        justify-content: center !important;
+      }
+
+      .top-controls {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        width: 100% !important;
+        gap: 6px !important;
+      }
+
+      .btn-icon {
+        flex: 1 1 calc(50% - 6px) !important;
+        padding: 8px 6px !important;
+        font-size: 0.75rem !important;
+        justify-content: center !important;
+      }
+
+      .btn-icon:nth-child(3) {
+        flex: 1 1 100% !important;
+      }
+
+      /* 3. Empilha as Abas do topo */
+      .nav-tabs {
+        flex-direction: column !important;
+        gap: 6px !important;
+      }
+
+      .tab-btn {
+        width: 100% !important;
+        font-size: 0.85rem !important;
+        padding: 8px !important;
+      }
+
+      /* 4. Empilha "Cenários da Plataforma" e "CPM Personalizado" na vertical */
+      .calculator-sections {
+        grid-template-columns: 1fr !important;
+        gap: 18px !important;
+      }
+
+      /* 5. Ajusta os 3 Quadros (Baixa, Média, Alta) para caberem perfeitamente em 1 linha */
+      .results-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 5px !important;
+      }
+
+      .result-card {
+        padding: 10px 2px !important;
+      }
+
+      .result-card h4 {
+        font-size: 0.75rem !important;
+        margin-bottom: 3px !important;
+      }
+
+      .result-card .cpm {
+        font-size: 0.65rem !important;
+        margin-bottom: 4px !important;
+      }
+
+      .result-card .value {
+        font-size: 0.78rem !important;
+      }
     }
 
-    .cpm-card,
-    .cpm-box,
-    div[class*="card-"] {
-      flex: 1 1 calc(33.33% - 8px) !important;
-      min-width: 90px !important;
-      max-width: 100% !important;
-      padding: 10px 6px !important;
-      box-sizing: border-box !important;
-    }
-
-    .cpm-card h4, .cpm-box h4 {
-      font-size: 0.85rem !important;
-    }
-    
-    .cpm-card strong, .cpm-box strong {
-      font-size: 0.95rem !important;
-    }
-  }
-
-    /* --- CORREÇÃO DEFINITIVA PARA CELULAR --- */
-@media (max-width: 600px) {
-
-  /* 1. Força os blocos principais a ficarem um debaixo do outro */
-  .card, 
-  .calculator-grid, 
-  .results-grid,
-  div[class*="grid"],
-  div[class*="row"],
-  div[class*="container"] {
-    display: block !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  /* 2. Corrige o input de CPM e a caixa roxa para não saírem da tela */
-  input, select, .card-custom, div[class*="custom"] {
-    max-width: 100% !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  /* 3. Alinha os 3 cards coloridos (Baixa, Média, Alta) em linha/grade no celular */
-  div:has(> .card-baixa),
-  div:has(> [class*="baixa"]),
-  .scenarios-container,
-  .cards-container {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    gap: 4px !important;
-    width: 100% !important;
-    justify-content: space-between !important;
-  }
-
-  /* 4. Reduz o tamanho interno dos 3 cards para caberem lado a lado sem estourar */
-  div[class*="baixa"], 
-  div[class*="media"], 
-  div[class*="alta"],
-  .cpm-card {
-    flex: 1 1 32% !important;
-    width: 32% !important;
-    min-width: 0 !important; /* Impede estouro de texto */
-    padding: 8px 4px !important;
-    box-sizing: border-box !important;
-    text-align: center !important;
-  }
-
-  /* Reduz levemente as fontes dentro dos cards para não quebrar número */
-  div[class*="baixa"] *, 
-  div[class*="media"] *, 
-  div[class*="alta"] * {
-    font-size: 0.75rem !important;
-  }
-}
 </style>
 </head>
 
