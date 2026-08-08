@@ -445,13 +445,50 @@ html, body {
   }
 }
 
-@media display-mode: standalone {
-  body {
-    -webkit-user-select: none; /* Deixa o uso mais parecido com app nativo */
-    user-select: none;
+/* Modo App Instalado (PWA em Tela Cheia) */
+  @media (display-mode: standalone) {
+    body {
+      -webkit-user-select: none;
+      user-select: none;
+    }
   }
-}
-  </style>
+
+  /* --- Ajuste dos Quadros Coloridos de CPM no Celular --- */
+  @media (max-width: 600px) {
+    .grid-results, 
+    .results-container,
+    div[style*="display: flex"] {
+      flex-direction: column !important;
+      width: 100% !important;
+    }
+
+    .cpm-boxes,
+    .cards-wrapper {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+      width: 100% !important;
+    }
+
+    .cpm-card,
+    .cpm-box,
+    div[class*="card-"] {
+      flex: 1 1 calc(33.33% - 8px) !important;
+      min-width: 90px !important;
+      max-width: 100% !important;
+      padding: 10px 6px !important;
+      box-sizing: border-box !important;
+    }
+
+    .cpm-card h4, .cpm-box h4 {
+      font-size: 0.85rem !important;
+    }
+    
+    .cpm-card strong, .cpm-box strong {
+      font-size: 0.95rem !important;
+    }
+  }
+</style>
 </head>
 
 <body>
